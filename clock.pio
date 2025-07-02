@@ -1,0 +1,43 @@
+;
+; Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+;
+; SPDX-License-Identifier: BSD-3-Clause
+;
+
+; SET pin 0 should be mapped to your LED GPIO
+
+.program shift_20_msb
+.side_set 2 opt
+
+.wrap_target
+    set y,7  side 2
+loop:
+    pull block                      ; Pull 32 bits from FIFO into OSR
+    set x, 19           side 0      ; Set X to 19 (for 20 bits: 19 down to 0)
+bitloop:
+    out pins, 1         side 1  [2] ; Output 1 bit to pin, clock high
+    nop                 side 0  [1] ; Clock low
+    jmp x--, bitloop                ; Loop until 20 bits shifted
+                                    ; Remaining 12 bits in OSR are ignored for now later usecase is charecter based pwm
+    jmp y--,skip_load               ; Loop 8 bytes 
+    set y,7             side 2      ; Reset digit counter load
+skip_load:
+    jmp loop
+.wrap
+% c-sdk {
+void shift_20_msb_program_init(PIO pio, uint sm, uint offset, uint pin, uint clk_pin) {
+  
+   pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+   pio_sm_set_consecutive_pindirs(pio, sm, clk_pin, 2, true);
+   pio_gpio_init(pio, pin);
+   pio_gpio_init(pio, clk_pin);
+   pio_gpio_init(pio, clk_pin+1);
+  
+   pio_sm_config c = shift_20_msb_program_get_default_config(offset);
+   sm_config_set_out_pins(&c, pin, 1);
+   sm_config_set_sideset_pins(&c, clk_pin);
+   sm_config_set_clkdiv(&c, 100);
+   sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
+   pio_sm_init(pio, sm, offset, &c);
+}
+%}
