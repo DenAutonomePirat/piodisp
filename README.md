@@ -26,4 +26,4 @@ This project contains PIO (Programmable I/O) programs and related code for displ
 - Refer to your VFD and driver datasheets for wiring and timing requirements.
 
 ## Example
-![Example Output](output.jpg)
+![Example Output](https://github.com/DenAutonomePirat/piodisp/blob/main/output.png)
