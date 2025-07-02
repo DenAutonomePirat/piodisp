@@ -14,7 +14,7 @@ This project contains PIO (Programmable I/O) programs and related code for displ
 ## Usage
 1. Assemble the `.pio` file using `pioasm` to generate the corresponding header for C/C++ projects:
     https://wokwi.com/tools/pioasm
-2. Include the generated header in your Pico SDK project.
+2. Include the generated header in your piolib project.
 3. Use the provided C-SDK initialization function in your firmware to set up the PIO state machine.
 4. Use the lookup table in `vfd.c` to convert display data to the correct bit pattern for the VFD.
 
