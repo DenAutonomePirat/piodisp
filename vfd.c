@@ -309,7 +309,7 @@ uint32_t char_to_bit(int in)
     case 0x42F:
         return 0x000e0887;
 
-        // Some others
+    // Some others
     case 0x5350:
         return 0x0;
     case 0x5351:

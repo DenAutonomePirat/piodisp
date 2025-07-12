@@ -12,7 +12,7 @@ void exit_handler(void)
 
 int main(void)
 {
-    printf("value of: '卐' %04x, %04x \n", '卐', '卐');
+
     PIO pio;
     int sm;
     uint offset;
