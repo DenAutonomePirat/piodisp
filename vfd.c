@@ -305,9 +305,15 @@ uint32_t char_to_bit(int in)
     // Cyrillic capital letter YU: 'Ю', U+042E, UTF-8: D0AE, Pronunciation: 'Yu' as in 'universe'
     case 0x42E:
         return 0x000a2289;
-    // Cyrillic capital letter YA: 'Я', U+042F, UTF-8: D0AF, Pronunciation: 'Ya' as in 'yard'
+    // Cyrillic capital letter YA: 'Я', U+042F, UTF-8: D0AF, Pronunciation: 'Ya' as in 'yard'▼1
     case 0x42F:
         return 0x000e0887;
+
+        // Some others
+    case 0x5350:
+        return 0x0;
+    case 0x5351:
+        return 0x0;
     default:
         return 0x00000000;
     }

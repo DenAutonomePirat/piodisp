@@ -12,6 +12,7 @@ void exit_handler(void)
 
 int main(void)
 {
+    printf("value of: '卐' %04x, %04x \n", '卐', '卐');
     PIO pio;
     int sm;
     uint offset;
@@ -20,8 +21,6 @@ int main(void)
 
     char line[33];
     uint32_t databuf[8];
-    int pass;
-    // uint i;
     uint pin = 16; //
     uint clk = 20; // load on sideset +1
 
@@ -38,11 +37,9 @@ int main(void)
     shift_20_msb_program_init(pio, sm, offset, pin, clk);
     pio_sm_set_enabled(pio, sm, true);
 
-    pass = 0;
     while (1)
     {
         fgets(line, sizeof(line), stdin);
-
         vfd_put_8_utf8(line, databuf);
 
         /*
@@ -60,13 +57,12 @@ int main(void)
 
         // use DMA to transfer data to PIO 20 kHz @ 12 %CPU
         pio_sm_xfer_data(pio, sm, PIO_DIR_TO_SM, sizeof(databuf), databuf);
-        // sleep_ms(1); // Uncomment if you want to slow down the loop
-        pass++;
     }
+    /*
+        // not needed thanks to the underlaying lib ???
 
-    fprintf(stdout, "Pass %d: Sent data to PIO\n", pass);
-    pio_sm_set_enabled(pio, sm, false);
-    pio_sm_unclaim(pio, sm);
-
+        pio_sm_set_enabled(pio, sm, false);
+        pio_sm_unclaim(pio, sm);
+    */
     return 0;
 }
