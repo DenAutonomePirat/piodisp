@@ -12,16 +12,17 @@ int main(int argc, const char **argv)
     int sm;
     uint offset;
 
+    const char *fifo_path = "/tmp/myfifo";
+    if (argc > 1)
+        fifo_path = argv[1];
+
     char line[33];
     uint32_t databuf[8];
-    uint gpio = 2;
     int pass;
     // uint i;
     uint pin = 16; //
     uint clk = 20; // load on sideset +1
 
-    if (argc == 2)
-        gpio = (uint)strtoul(argv[1], NULL, 0);
     pio = pio0;
     // sm = 0;
     // pio_sm_claim(pio, sm);
@@ -29,32 +30,18 @@ int main(int argc, const char **argv)
     pio_sm_config_xfer(pio, sm, PIO_DIR_TO_SM, 256, 1);
 
     offset = pio_add_program(pio, &shift_20_msb_program);
-    printf("Loaded program at %d, using sm %d, gpio %d\n", offset, sm, gpio);
+    printf("Loaded program at %d, using sm %d, fifo %s\n", offset, sm, fifo_path);
 
     pio_sm_clear_fifos(pio, sm);
     shift_20_msb_program_init(pio, sm, offset, pin, clk);
     pio_sm_set_enabled(pio, sm, true);
 
-    // Open FIFO for reading
-    FILE *fifo = fopen("/tmp/myfifo", "rb");
-    if (!fifo)
-    {
-        perror("Failed to open FIFO");
-        return 1;
-    }
-
     pass = 0;
     while (1)
     {
-        fgets(line, sizeof(line), fifo);
+        fgets(line, sizeof(line), stdin);
 
         vfd_put_8_utf8(line, databuf);
-
-        if (feof(fifo))
-        {
-            fprintf(stderr, "End of FIFO reached\n");
-            break; // Exit the loop if EOF is reached
-        }
 
         /*
         // Use sequential access to send data 8 kHz @ 35 %CPU
@@ -77,7 +64,6 @@ int main(int argc, const char **argv)
 
     fprintf(stdout, "Pass %d: Sent data to PIO\n", pass);
     pio_sm_set_enabled(pio, sm, false);
-    fclose(fifo);
     pio_sm_unclaim(pio, sm);
 
     return 0;
