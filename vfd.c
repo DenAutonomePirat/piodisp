@@ -1,13 +1,26 @@
+// IV-4 18 Segment VFD layout
+//
+// #######       0
+//   - -        1 2
+//  |\|/|      34567
+//   - -        8 9
+//  |/|\|      abcde
+//   - -        f g
+// *     *    h     i
+#define s0 0x00004000
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 uint32_t char_to_bit(int in)
 {
+    printf("%04x\n", in);
     switch (in)
     {
+
     case ' ':
-        return 0x00000000;
+        return 0x00004000;
     case '!':
         return 0x000000c1;
     case '"':
@@ -40,45 +53,45 @@ uint32_t char_to_bit(int in)
     case '/':
         return 0x00000808;
     case '1':
-        return 0x00006001;
-    // return 0x00008400;
+        //    return 0x00006001;
+        return 0x00008400;
     // return 0x00000081;
     // return 0x00000089;
     case '2':
-        return 0x000e9800;
-    // return 0x00063107;
+        //    return 0x000e9802;
+        return 0x00063107;
     case '3':
-        return 0x00069400;
-    // return 0x00000187;
-    // return 0x00041187;
+        //    return 0x00069400;
+        //    return 0x00000187;
+        return 0x00041187;
     case '4':
-        return 0x000a8400;
-    // return 0x00008085;
-    // return 0x000a0085;
+        //  return 0x000a8400;
+        //    return 0x00008085;
+        return 0x000a0085;
     case '5':
-        return 0x000e1400;
-    // return 0x00008186;
-    // return 0x000e1302;
+        //    return 0x000e1400;
+        //  return 0x00008186;
+        return 0x000e1302;
     case '6':
-        return 0x000e3400;
-    // return 0x00008586;
-    // return 0x000e3186;
+        //    return 0x000e3400;
+        //    return 0x00008586;
+        return 0x000e3186;
     case '7':
-        return 0x00048400;
-    // return 0x00000083;
-    // return 0x00040083;
+        //    return 0x00048400;
+        //    return 0x00000083;
+        return 0x00040083;
     case '8':
-        return 0x000eb400;
-    // return 0x00008587;
-    // return 0x000e3187;
+        //  return 0x000eb400;
+        //    return 0x00008587;
+        return 0x000e3187;
     case '9':
-        return 0x000e9400;
-    // return 0x00008187;
-    // return 0x000e1187;
+        //      return 0x000e9400;
+        //    return 0x00008187;
+        return 0x000e1187;
     case '0':
-        return 0x000cb400;
-    // return 0x00008583;
-    // return 0x000c398b;
+        // return 0x000cb400;
+        //    return 0x00008583;
+        return 0x000c398b;
     case ':':
         return 0x00008400;
     case ';':
@@ -296,7 +309,7 @@ uint32_t char_to_bit(int in)
     case 0x42F:
         return 0x000e0887;
     default:
-        return 0x00000001;
+        return 0x00000000;
     }
 }
 // this function takes a string of 8 characters and converts each character to its corresponding bit representation
@@ -343,6 +356,20 @@ static uint32_t utf8_decode(const char **s)
     return cp;
 }
 
+// Reverses only the lowest 20 bits of x, leaves upper 12 bits unchanged
+uint32_t reverse_last_20_bits(uint32_t x)
+{
+    uint32_t in = x & 0xFFFFF; // extract last 20 bits
+    uint32_t out = 0;
+    for (int i = 0; i < 20; ++i)
+    {
+        out <<= 1;
+        out |= (in & 1);
+        in >>= 1;
+    }
+    // combine reversed 20 bits with upper 12 bits
+    return (x & 0xFFF00000) | out;
+}
 // Updated function: takes a UTF-8 string and converts the first 8 code points to bit patterns
 void vfd_put_8_utf8(const char *input, uint32_t *dst)
 {
@@ -355,9 +382,7 @@ void vfd_put_8_utf8(const char *input, uint32_t *dst)
         else
         {
             uint32_t cp = utf8_decode(&input);
-            // printf("%x ", cp);
-            dst[i] = char_to_bit(cp);
+            dst[i] = reverse_last_20_bits(char_to_bit(cp)) | 0x10004000;
         }
-        // printf("\n");
     }
 }

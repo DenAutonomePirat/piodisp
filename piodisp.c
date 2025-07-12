@@ -5,16 +5,18 @@
 #include "piolib.h"
 #include "clock.pio.h"
 #include "vfd.c"
+void exit_handler(void)
+{
+    printf("exit");
+}
 
-int main(int argc, const char **argv)
+int main(void)
 {
     PIO pio;
     int sm;
     uint offset;
 
-    const char *fifo_path = "/tmp/myfifo";
-    if (argc > 1)
-        fifo_path = argv[1];
+    atexit(exit_handler);
 
     char line[33];
     uint32_t databuf[8];
@@ -30,7 +32,7 @@ int main(int argc, const char **argv)
     pio_sm_config_xfer(pio, sm, PIO_DIR_TO_SM, 256, 1);
 
     offset = pio_add_program(pio, &shift_20_msb_program);
-    printf("Loaded program at %d, using sm %d, fifo %s\n", offset, sm, fifo_path);
+    printf("Loaded program at %d, using sm %d\n", offset, sm);
 
     pio_sm_clear_fifos(pio, sm);
     shift_20_msb_program_init(pio, sm, offset, pin, clk);

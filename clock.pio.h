@@ -54,7 +54,7 @@ void shift_20_msb_program_init(PIO pio, uint sm, uint offset, uint pin, uint clk
     pio_sm_config c = shift_20_msb_program_get_default_config(offset);
     sm_config_set_out_pins(&c, pin, 1);
     sm_config_set_sideset_pins(&c, clk_pin);
-    sm_config_set_clkdiv(&c, 1000);
+    sm_config_set_clkdiv(&c, 100);
     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
     pio_sm_init(pio, sm, offset, &c);
 }

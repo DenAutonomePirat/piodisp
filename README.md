@@ -7,7 +7,7 @@ This project contains PIO (Programmable I/O) programs and related code for displ
 - `vfd.c`: Lookup table and logic for segment mapping and VFD control.
 
 ## Hardware
-- Raspberry Pi 5 (or compatible RP2040 board)
+- Raspberry Pi 5
 - VFD (Vacuum Fluorescent Display)
 - MAX6921xx or similar shift register/driver IC
 
